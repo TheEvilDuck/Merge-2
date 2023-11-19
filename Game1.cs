@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -6,8 +7,12 @@ namespace Merge_3;
 
 public class Game1 : Game
 {
+    private const byte FIELD_SIZE = 8;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    private Field _field;
+    private Texture2D _cellTexture;
 
     public Game1()
     {
@@ -19,6 +24,10 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
+        _field = new Field(FIELD_SIZE);
+        _field.GenerateField();
+        Window.Title = "Merge-3 game for GameForest";
+
 
         base.Initialize();
     }
@@ -27,6 +36,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+        _cellTexture = new Texture2D(GraphicsDevice,1,1);
+        _cellTexture.SetData<Color>(new Color [] { Color.Gray });
         // TODO: use this.Content to load your game content here
     }
 
@@ -36,7 +47,6 @@ public class Game1 : Game
             Exit();
 
         // TODO: Add your update logic here
-
         base.Update(gameTime);
     }
 
@@ -44,7 +54,9 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        _spriteBatch.Begin();
+        _spriteBatch.Draw(_cellTexture, new Rectangle(10,10,10,10), Color.White);
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }

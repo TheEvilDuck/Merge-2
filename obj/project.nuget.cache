@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+jcGp4puVfllC0u4OtZ4vQMs1ciE48AWYEqNLYNnreIQBm4cfnYvTF5oBOalZJ49KYv/jeDT//YTbQMcFD/q4A==",
+  "dgSpecHash": "Er0AatG8G8YBep+YbA0tz6ha8PgjXqGkbmJ51f14337AipodaFoNYKQxQerLDBIeGAatO5nR8t1DbC0srZWy+w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\Merge-3.csproj",
+  "projectFilePath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\Merge-3.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\TheEvilDuck\\.nuget\\packages\\monogame.content.builder.task\\3.8.1.303\\monogame.content.builder.task.3.8.1.303.nupkg.sha512",
     "C:\\Users\\TheEvilDuck\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.1.303\\monogame.framework.desktopgl.3.8.1.303.nupkg.sha512",

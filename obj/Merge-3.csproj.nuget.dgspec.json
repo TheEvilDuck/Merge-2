@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\Merge-3.csproj": {}
+    "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\Merge-3.csproj": {}
   },
   "projects": {
-    "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\Merge-3.csproj": {
+    "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\Merge-3.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\Merge-3.csproj",
+        "projectUniqueName": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\Merge-3.csproj",
         "projectName": "Merge-3",
-        "projectPath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\Merge-3.csproj",
+        "projectPath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\Merge-3.csproj",
         "packagesPath": "C:\\Users\\TheEvilDuck\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-3\\obj\\",
+        "outputPath": "C:\\Users\\TheEvilDuck\\Desktop\\Merge-2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\TheEvilDuck\\AppData\\Roaming\\NuGet\\NuGet.Config"
