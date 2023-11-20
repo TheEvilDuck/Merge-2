@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -11,8 +10,9 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
-    private Field _field;
-    private Texture2D _cellTexture;
+    private StateMachine _gameStateMachine;
+    private PlayerInput _playerInput;
+    
 
     public Game1()
     {
@@ -23,11 +23,9 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-        _field = new Field(FIELD_SIZE);
-        _field.GenerateField();
-        Window.Title = "Merge-3 game for GameForest";
-
+        Window.Title = "Merge-2 game for GameForest";
+        _playerInput = new PlayerInput();
+        _gameStateMachine = new StateMachine();
 
         base.Initialize();
     }
@@ -36,9 +34,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _cellTexture = new Texture2D(GraphicsDevice,1,1);
-        _cellTexture.SetData<Color>(new Color [] { Color.Gray });
-        // TODO: use this.Content to load your game content here
+        _gameStateMachine.AddState(new MainMenuState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput));
+        _gameStateMachine.AddState(new CoreGameState(_gameStateMachine, FIELD_SIZE,_spriteBatch,GraphicsDevice));
     }
 
     protected override void Update(GameTime gameTime)
@@ -46,7 +43,9 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
+        _playerInput.HandleInput();
+        _gameStateMachine?.Update();
+
         base.Update(gameTime);
     }
 
@@ -55,7 +54,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         _spriteBatch.Begin();
-        _spriteBatch.Draw(_cellTexture, new Rectangle(10,10,10,10), Color.White);
+        _gameStateMachine.Draw();
         _spriteBatch.End();
 
         base.Draw(gameTime);
