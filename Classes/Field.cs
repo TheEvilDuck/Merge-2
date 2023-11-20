@@ -8,7 +8,8 @@ public class Field
     private int _size;
     private Cell[,] _cells;
 
-    public event Action<Vector2> cellAdded;
+    public event Action<int,int,int> cellAdded;
+    public event Action<int,int> cellRemoved;
 
     public Field(int size)
     {
@@ -39,9 +40,42 @@ public class Field
             yNotUsedYet.RemoveAt(yId);
         }
     }
+
+    public bool CombineTwoCells(int x1,int y1,int x2,int y2)
+    {
+        if (x1==x2&&y1==y2)
+            return false;
+
+        if (x1<0||x2<0||y1<0||y2<0
+        ||x1>=_size||x2>=_size
+        ||y1>=_size||y2>=_size)
+            return false;
+        
+        if (_cells[x2,y2]==null&&_cells[x1,y1]!=null)
+        {
+            Console.WriteLine($"Was from {_cells[x1,y1]} to {_cells[x2,y2]}");
+            _cells[x2,y2] = _cells[x1,y1];
+            cellAdded?.Invoke(x2,y2, 1);
+            _cells[x1,y1] = null;
+            cellRemoved?.Invoke(x1,y1);
+
+            Console.WriteLine($"Became {_cells[x1,y1]} and  {_cells[x2,y2]}");
+            return true;
+        }
+        return false;
+    }
+
+    public void RemoveCellAt(int x,int y)
+    {
+        if (x<0||y<0||x>=_size||y>=_size)
+            return;
+        
+        _cells[x,y] = null;
+        cellRemoved?.Invoke(x,y);
+    }
     private void GenerateCellContentAt(int x,int y)
     {
         _cells[x,y] = new Cell(CellColor.Blue,1);
-        cellAdded?.Invoke(new Vector2(x,y));
+        cellAdded?.Invoke(x,y, 1);
     }
 }

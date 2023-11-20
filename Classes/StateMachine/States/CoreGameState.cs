@@ -23,16 +23,10 @@ public class CoreGameState : State
 
         _fieldVisuals.Draw();
     }
-    public override void Enter()
-    {
-        base.Enter();
-
-        _fieldVisuals.SubToInput();
-    }
     public override void Exit()
     {
         base.Exit();
 
-        _fieldVisuals.UnSubToInput();
+        _fieldVisuals.UnSubFromInput();
     }
 }
