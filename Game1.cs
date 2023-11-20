@@ -34,8 +34,10 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _gameStateMachine.AddState(new MainMenuState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput));
-        _gameStateMachine.AddState(new CoreGameState(_gameStateMachine, FIELD_SIZE,_spriteBatch,GraphicsDevice));
+        
+        SpriteFont spriteFont = Content.Load<SpriteFont>("Font");
+        _gameStateMachine.AddState(new MainMenuState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont));
+        _gameStateMachine.AddState(new CoreGameState(_gameStateMachine, FIELD_SIZE,_spriteBatch,GraphicsDevice,spriteFont,_playerInput));
     }
 
     protected override void Update(GameTime gameTime)
@@ -44,7 +46,7 @@ public class Game1 : Game
             Exit();
 
         _playerInput.HandleInput();
-        _gameStateMachine?.Update();
+        _gameStateMachine.Update();
 
         base.Update(gameTime);
     }
@@ -53,9 +55,7 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch.Begin();
         _gameStateMachine.Draw();
-        _spriteBatch.End();
 
         base.Draw(gameTime);
     }

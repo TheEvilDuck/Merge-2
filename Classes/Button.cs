@@ -24,6 +24,14 @@ public class Button
     {
         if (_buttonRectangle.Contains(position.X,position.Y))
             clicked?.Invoke();
+    }
 
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.Begin();
+        spriteBatch.Draw(_texture,_buttonRectangle,Color.White);
+        if (_spriteFont!=null)
+            spriteBatch.DrawString(_spriteFont,_text,new Vector2(_buttonRectangle.X,_buttonRectangle.Y),Color.White);
+        spriteBatch.End();
     }
 }

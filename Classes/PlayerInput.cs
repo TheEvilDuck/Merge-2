@@ -9,15 +9,26 @@ public class PlayerInput
     public event Action<Vector2> mouseDown;
     public event Action<Vector2> mouseReleased;
 
-    private MouseState _lastMouseState;
+    private bool _clicked = false;
 
     public void HandleInput()
     {
         MouseState currentMouseState = Mouse.GetState();
 
-        if (currentMouseState.LeftButton == ButtonState.Released && _lastMouseState.LeftButton == ButtonState.Pressed)
+        if (currentMouseState.LeftButton == ButtonState.Pressed && !_clicked)
+        {
             mouseClicked?.Invoke(new Vector2(currentMouseState.X,currentMouseState.Y));
+            _clicked = true;
+        }
+        
+        if (currentMouseState.LeftButton == ButtonState.Pressed)
+            mouseDown?.Invoke(new Vector2(currentMouseState.X,currentMouseState.Y));
 
-        _lastMouseState = currentMouseState;
+        if (currentMouseState.LeftButton == ButtonState.Released)
+        {
+            mouseReleased?.Invoke(new Vector2(currentMouseState.X,currentMouseState.Y));
+            _clicked = false;
+        }
+
     }
 }
