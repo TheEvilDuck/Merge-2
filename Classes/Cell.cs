@@ -11,4 +11,11 @@ public class Cell
         _color = color;
         _level = level;
     }
+
+    public void LevelUp()
+    {
+        _level++;
+        if (_level>4)
+            _level = 4;
+    }
 }

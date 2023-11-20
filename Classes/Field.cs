@@ -53,13 +53,37 @@ public class Field
         
         if (_cells[x2,y2]==null&&_cells[x1,y1]!=null)
         {
-            Console.WriteLine($"Was from {_cells[x1,y1]} to {_cells[x2,y2]}");
             _cells[x2,y2] = _cells[x1,y1];
-            cellAdded?.Invoke(x2,y2, 1);
+            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
             _cells[x1,y1] = null;
             cellRemoved?.Invoke(x1,y1);
+            return true;
+        }
+        if (_cells[x1,y1]!=null&&_cells[x2,y2]!=null)
+        {
+            if (_cells[x1,y1].Level==_cells[x2,y2].Level
+            && _cells[x1,y1].Color==_cells[x2,y2].Color)
+            {
+                _cells[x2,y2].LevelUp();
+                _cells[x1,y1] = null;
 
-            Console.WriteLine($"Became {_cells[x1,y1]} and  {_cells[x2,y2]}");
+                cellRemoved?.Invoke(x1,y1);
+                cellRemoved?.Invoke(x2,y2);
+
+                cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
+
+                return true;
+            }
+            cellRemoved?.Invoke(x1,y1);
+            cellRemoved?.Invoke(x2,y2);
+
+            Cell buff = _cells[x2,y2];
+            _cells[x2,y2] = _cells[x1,y1];
+            _cells[x1,y1] = buff;
+
+            cellAdded?.Invoke(x1,y1, _cells[x1,y1].Level);
+            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
+
             return true;
         }
         return false;
