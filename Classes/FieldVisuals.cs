@@ -18,16 +18,15 @@ public class FieldVisuals
     private Texture2D _buttonTexture;
     private SpriteFont _buttonSpriteFont;
     private byte _fieldSize;
+    private int _xOffset;
+    private int _yOffset;
     private PlayerInput _playerInput;
 
     private Dictionary<Button,Vector2>_visualCells;
+    private Button _holdCell;
 
-#nullable enable
-    private Button? _holdCell;
 
-#nullable disable
-
-    public FieldVisuals(SpriteBatch spriteBatch,GraphicsDevice graphicsDevice,byte fieldSize,Field field, SpriteFont spriteFont,PlayerInput playerInput)
+    public FieldVisuals(SpriteBatch spriteBatch,GraphicsDevice graphicsDevice,byte fieldSize,Field field, SpriteFont spriteFont,PlayerInput playerInput,int xOffset,int yOffset)
     {
         _spriteBatch = spriteBatch;
         _cellTexture = new Texture2D(graphicsDevice,1,1);
@@ -37,6 +36,8 @@ public class FieldVisuals
         _fieldSize = fieldSize;
         _buttonSpriteFont = spriteFont;
         _playerInput = playerInput;
+        _yOffset = yOffset-fieldSize*(CELL_VISUAL_SIZE+CELL_SPACING)/2;
+        _xOffset = xOffset-fieldSize*(CELL_VISUAL_SIZE+CELL_SPACING)/2;
 
         _visualCells = new Dictionary<Button,Vector2>();
         field.cellAdded+=OnCellAdded;
@@ -55,7 +56,7 @@ public class FieldVisuals
         {
             for (byte y = 0;y<_fieldSize;y++)
             {
-                Rectangle cellVisual = new Rectangle(x*(CELL_VISUAL_SIZE+CELL_SPACING),y*(CELL_VISUAL_SIZE+CELL_SPACING),CELL_VISUAL_SIZE,CELL_VISUAL_SIZE);
+                Rectangle cellVisual = new Rectangle(x*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,y*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset,CELL_VISUAL_SIZE,CELL_VISUAL_SIZE);
                 _spriteBatch.Draw(_cellTexture,cellVisual,Color.White);
             }
         }
@@ -91,14 +92,14 @@ public class FieldVisuals
     {
         if (_holdCell==null)
             return;
-
+        Vector2 positionWithoutOffset = atPosition- new Vector2(_xOffset,_yOffset);
         if (_visualCells.TryGetValue(_holdCell,out Vector2 holdCellIndexes))
         {
             int x1 = (int)holdCellIndexes.X;
             int y1 = (int)holdCellIndexes.Y;
 
-            int x2 = (int)(atPosition.X/(CELL_VISUAL_SIZE+CELL_SPACING));
-            int y2 = (int)(atPosition.Y/(CELL_VISUAL_SIZE+CELL_SPACING));
+            int x2 = (int)(positionWithoutOffset.X/(CELL_VISUAL_SIZE+CELL_SPACING));
+            int y2 = (int)(positionWithoutOffset.Y/(CELL_VISUAL_SIZE+CELL_SPACING));
         
             bool success = cellDropped.Invoke(x1,y1,x2,y2);
 
@@ -113,8 +114,8 @@ public class FieldVisuals
     private void OnCellAdded(int xIndex, int yIndex, int level)
     {
         Rectangle rectangle = new Rectangle(
-            xIndex*(CELL_VISUAL_SIZE+CELL_SPACING),
-            yIndex*(CELL_VISUAL_SIZE+CELL_SPACING),
+            xIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,
+            yIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset,
             CELL_VISUAL_SIZE,
             CELL_VISUAL_SIZE);
         Button button = new Button(_buttonTexture,_buttonSpriteFont,level.ToString(),rectangle);
@@ -134,6 +135,7 @@ public class FieldVisuals
         {
             if (keyValuePair.Value.X==xIndex&&keyValuePair.Value.Y==yIndex)
             {
+                _playerInput.mouseClicked -= keyValuePair.Key.OnPlayerClickedAtPosition;
                 _visualCells.Remove(keyValuePair.Key);
                 Console.WriteLine($"Removed at {keyValuePair.Value} in visuals");
             }
@@ -143,8 +145,8 @@ public class FieldVisuals
     private Vector2 ConvertIndexesToPosition(int xIndex,int yIndex)
     {
         return new Vector2(
-            xIndex*(CELL_VISUAL_SIZE+CELL_SPACING),
-            yIndex*(CELL_VISUAL_SIZE+CELL_SPACING)
+            xIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,
+            yIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset
         );
     }
 
