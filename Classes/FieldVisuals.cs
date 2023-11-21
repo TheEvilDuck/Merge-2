@@ -12,7 +12,15 @@ public class FieldVisuals
     private const int CELL_SPACING = 4;
 
     public Func<int,int,int,int,bool> cellDropped;
+    public Func<int,int,bool> cellDoubleClicked;
 
+    private readonly Dictionary<CellColor,Color>_cellColors = new Dictionary<CellColor, Color>
+    {
+        {CellColor.Green,Color.Green},
+        {CellColor.Red,Color.Red},
+        {CellColor.Blue,Color.Blue}
+
+    };
     private SpriteBatch _spriteBatch;
     private Texture2D _cellTexture;
     private Texture2D _buttonTexture;
@@ -32,7 +40,7 @@ public class FieldVisuals
         _cellTexture = new Texture2D(graphicsDevice,1,1);
         _cellTexture.SetData<Color>(new Color [] { Color.Gray });
         _buttonTexture = new Texture2D(graphicsDevice,1,1);
-        _buttonTexture.SetData<Color>(new Color [] { Color.Blue });
+        _buttonTexture.SetData<Color>(new Color [] { Color.White });
         _fieldSize = fieldSize;
         _buttonSpriteFont = spriteFont;
         _playerInput = playerInput;
@@ -47,6 +55,7 @@ public class FieldVisuals
         _playerInput.mouseReleased+=DropCell;
 
         cellDropped+=field.CombineTwoCells;
+        cellDoubleClicked+=field.TryGenerateNewCellFrom;
     }
     public void Draw()
     {
@@ -78,6 +87,7 @@ public class FieldVisuals
         foreach (KeyValuePair<Button,Vector2>button in _visualCells)
         {
             _playerInput.mouseClicked -= button.Key.OnPlayerClickedAtPosition;
+            _playerInput.mouseDoubleClicked-=button.Key.OnPlayerDoubleClickedAtPosition;
         }
     }
     private void HoldCell(Vector2 atPosition)
@@ -111,20 +121,37 @@ public class FieldVisuals
         _holdCell = null;
     }
     
-    private void OnCellAdded(int xIndex, int yIndex, int level)
+    private void OnCellAdded(int xIndex, int yIndex, int level, CellColor cellColor)
     {
         Rectangle rectangle = new Rectangle(
             xIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,
             yIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset,
             CELL_VISUAL_SIZE,
             CELL_VISUAL_SIZE);
+        
         Button button = new Button(_buttonTexture,_buttonSpriteFont,level.ToString(),rectangle);
+        button.SetColor(_cellColors.GetValueOrDefault(cellColor));
         _visualCells.Add(button,new Vector2(xIndex,yIndex));
+
         _playerInput.mouseClicked += button.OnPlayerClickedAtPosition;
+        _playerInput.mouseDoubleClicked+=button.OnPlayerDoubleClickedAtPosition;
+
         Console.WriteLine($"Added new visuals in {new Vector2(xIndex,yIndex)}");
+
         button.clicked+=() =>
         {
             _holdCell = button;
+        };
+
+        button.doubleClicked+=() =>
+        {
+            if (_visualCells.ContainsKey(button))
+            {
+                Vector2 indexes = _visualCells[button];
+
+                bool success = cellDoubleClicked.Invoke((int)indexes.X,(int)indexes.Y);
+                Console.WriteLine(success);
+            }
         };
 
     }
@@ -136,6 +163,7 @@ public class FieldVisuals
             if (keyValuePair.Value.X==xIndex&&keyValuePair.Value.Y==yIndex)
             {
                 _playerInput.mouseClicked -= keyValuePair.Key.OnPlayerClickedAtPosition;
+                _playerInput.mouseDoubleClicked -= keyValuePair.Key.OnPlayerDoubleClickedAtPosition;
                 _visualCells.Remove(keyValuePair.Key);
                 Console.WriteLine($"Removed at {keyValuePair.Value} in visuals");
             }

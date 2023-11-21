@@ -9,8 +9,10 @@ public class Button
     private SpriteFont _spriteFont;
     private string _text;
     private Rectangle _buttonRectangle;
+    private Color _color = Color.White;
 
     public event Action clicked;
+    public event Action doubleClicked;
 
     public Vector2 Position => new Vector2(_buttonRectangle.X,_buttonRectangle.Y);
 
@@ -22,16 +24,25 @@ public class Button
         _buttonRectangle = buttonRectangle;
     }
 
+    public void SetColor(Color color)
+    {
+        _color = color;
+    }
     public void OnPlayerClickedAtPosition(Vector2 position)
     {
         if (_buttonRectangle.Contains(position.X,position.Y))
             clicked?.Invoke();
     }
+    public void OnPlayerDoubleClickedAtPosition(Vector2 position)
+    {
+        if (_buttonRectangle.Contains(position.X,position.Y))
+            doubleClicked?.Invoke();
+    }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
-        spriteBatch.Draw(_texture,_buttonRectangle,Color.White);
+        spriteBatch.Draw(_texture,_buttonRectangle,_color);
 
         if (_spriteFont!=null)
             spriteBatch.DrawString(_spriteFont,_text,new Vector2(_buttonRectangle.X,_buttonRectangle.Y),Color.White);

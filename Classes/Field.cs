@@ -8,7 +8,7 @@ public class Field
     private int _size;
     private Cell[,] _cells;
 
-    public event Action<int,int,int> cellAdded;
+    public event Action<int,int,int,CellColor> cellAdded;
     public event Action<int,int> cellRemoved;
 
     public Field(int size)
@@ -18,26 +18,14 @@ public class Field
     }
     public void GenerateField(int startCellContentCount)
     {
-        List<int>xNotUsedYet = new List<int>();
-        List<int>yNotUsedYet = new List<int>();
-
-        for (int i =0;i<_size;i++)
+        for (int i = 0;i<startCellContentCount;i++)
         {
-            xNotUsedYet.Add(i);
-            yNotUsedYet.Add(i);
-        }
-
-        Random random = new Random();
-
-        for (int cellCount = 0;cellCount<startCellContentCount;cellCount++)
-        {
-            int xId = random.Next(0,xNotUsedYet.Count-1);
-            int yId = random.Next(0,yNotUsedYet.Count-1);
-
-            GenerateCellContentAt(xNotUsedYet[xId],yNotUsedYet[yId]);
-
-            xNotUsedYet.RemoveAt(xId);
-            yNotUsedYet.RemoveAt(yId);
+            int x,y;
+            if (TryGetRandomPosition(out x,out y))
+            {
+                _cells[x,y] = new BlueCell(1);
+                cellAdded.Invoke(x,y,_cells[x,y].Level,_cells[x,y].Color);
+            }
         }
     }
 
@@ -54,7 +42,7 @@ public class Field
         if (_cells[x2,y2]==null&&_cells[x1,y1]!=null)
         {
             _cells[x2,y2] = _cells[x1,y1];
-            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
+            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level,_cells[x2,y2].Color);
             _cells[x1,y1] = null;
             cellRemoved?.Invoke(x1,y1);
             return true;
@@ -64,15 +52,19 @@ public class Field
             if (_cells[x1,y1].Level==_cells[x2,y2].Level
             && _cells[x1,y1].Color==_cells[x2,y2].Color)
             {
-                _cells[x2,y2].LevelUp();
-                _cells[x1,y1] = null;
+                if (_cells[x2,y2].LevelUp())
+                {
+                    _cells[x1,y1] = null;
 
-                cellRemoved?.Invoke(x1,y1);
-                cellRemoved?.Invoke(x2,y2);
+                    cellRemoved?.Invoke(x1,y1);
+                    cellRemoved?.Invoke(x2,y2);
 
-                cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
+                    Console.WriteLine($"Cell at {x2},{y2} just level uped to {_cells[x2,y2].Level}. Can generate: {_cells[x2,y2].CanGenerate}");
 
-                return true;
+                    cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level,_cells[x2,y2].Color);
+
+                    return true;
+                }
             }
             cellRemoved?.Invoke(x1,y1);
             cellRemoved?.Invoke(x2,y2);
@@ -81,14 +73,13 @@ public class Field
             _cells[x2,y2] = _cells[x1,y1];
             _cells[x1,y1] = buff;
 
-            cellAdded?.Invoke(x1,y1, _cells[x1,y1].Level);
-            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level);
+            cellAdded?.Invoke(x1,y1, _cells[x1,y1].Level,_cells[x1,y1].Color);
+            cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level,_cells[x2,y2].Color);
 
             return true;
         }
         return false;
     }
-
     public void RemoveCellAt(int x,int y)
     {
         if (x<0||y<0||x>=_size||y>=_size)
@@ -97,9 +88,60 @@ public class Field
         _cells[x,y] = null;
         cellRemoved?.Invoke(x,y);
     }
-    private void GenerateCellContentAt(int x,int y)
+
+    public bool TryGenerateNewCellFrom(int x, int y)
     {
-        _cells[x,y] = new Cell(CellColor.Blue,1);
-        cellAdded?.Invoke(x,y, 1);
+        Console.WriteLine($"Try generate at: {x} , {y}");
+        if (_cells[x,y]==null)
+            return false;
+        Console.WriteLine("It's not null, good");
+        
+        if (!_cells[x,y].CanGenerate)
+            return false;
+        Console.WriteLine($"It can generate because of level {_cells[x,y].Level}");
+
+        int xPos,yPos;
+
+        if (TryGetRandomPosition(out xPos,out yPos))
+        {
+            _cells[xPos,yPos] = _cells[x,y].Generate();
+            cellAdded.Invoke(xPos,yPos,_cells[xPos,yPos].Level,_cells[xPos,yPos].Color);
+
+            return true;
+        }
+        Console.WriteLine("Couldn't find empty space for new cell");
+
+        return false;
+    }
+
+    private bool TryGetRandomPosition(out int newX, out int newY)
+    {
+        List<Vector2>freeCells = new List<Vector2>();
+
+        for (int x = 0;x< _size;x++)
+        {
+            for (int y = 0;y<_size;y++)
+            {
+                if (_cells[x,y]==null)
+                {
+                    freeCells.Add(new Vector2(x,y));
+                }
+            }
+        }
+
+        newX = -1;
+        newY = -1;
+
+        if (freeCells.Count==0)
+            return false;
+
+        Random random = new Random();
+
+        Vector2 randomPos = freeCells[random.Next(0,freeCells.Count-1)];
+
+        newX = (int)randomPos.X;
+        newY = (int)randomPos.Y;
+
+        return true;
     }
 }
