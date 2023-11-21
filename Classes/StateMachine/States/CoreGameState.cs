@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 public class CoreGameState : State
 {
+    private const int ORDERS_TO_GAME_OWER = 10;
     private Field _field;
     private FieldVisuals _fieldVisuals;
     private SpriteBatch _spriteBatch;
@@ -10,6 +11,7 @@ public class CoreGameState : State
     private byte _fieldSize;
     private SpriteFont _spriteFont;
     private PlayerInput _playerInput;
+    private PlayerStats _playerStats;
 
     public CoreGameState(StateMachine stateMachine, byte fieldSize,SpriteBatch spriteBatch,GraphicsDevice graphicsDevice,SpriteFont spriteFont,PlayerInput playerInput) : base(stateMachine)
     {
@@ -25,7 +27,17 @@ public class CoreGameState : State
         base.Enter();
 
         _field = new Field(_fieldSize);
-        _fieldVisuals = new FieldVisuals(_spriteBatch,_graphicsDevice,_fieldSize,_field,_spriteFont,_playerInput,_graphicsDevice.Viewport.Width/2,_graphicsDevice.Viewport.Height/2);
+
+        _fieldVisuals = new FieldVisuals(
+            _spriteBatch,
+            _graphicsDevice,
+            _fieldSize,
+            _field,_spriteFont,
+            _playerInput,
+            _graphicsDevice.Viewport.Width/2,
+            _graphicsDevice.Viewport.Height/2);
+
+        _playerStats = new PlayerStats();
 
         _field.GenerateField(8);
     }

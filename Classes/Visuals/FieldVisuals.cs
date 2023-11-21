@@ -129,7 +129,7 @@ public class FieldVisuals
             CELL_VISUAL_SIZE,
             CELL_VISUAL_SIZE);
         
-        Button button = new Button(_buttonTexture,_buttonSpriteFont,level.ToString(),rectangle);
+        Button button = new Button(_buttonTexture,rectangle,level.ToString(),_buttonSpriteFont);
         button.SetColor(_cellColors.GetValueOrDefault(cellColor));
         _visualCells.Add(button,new Vector2(xIndex,yIndex));
 

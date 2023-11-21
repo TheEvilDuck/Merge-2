@@ -13,7 +13,7 @@ public class MainMenuState : State
 
         Texture2D buttonTexture = new Texture2D(graphicsDevice,1,1);
         buttonTexture.SetData<Color>(new Color [] { Color.Gray });
-        _startButton = new Button(buttonTexture,spriteFont,"Play",new Rectangle(10,10,100,20));
+        _startButton = new Button(buttonTexture,new Rectangle(10,10,100,20),"Play",spriteFont);
         _startButton.clicked+=OnStartButtonClicked;
     }
 
