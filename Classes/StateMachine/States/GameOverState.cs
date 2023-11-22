@@ -55,6 +55,6 @@ public class GameOverState : State
 
     public void OnPointsChanged(int amount)
     {
-        _finaleScoreText.ChangeText($"Finale score: {amount} points");
+        _finaleScoreText.ChangeText($"Game over!\nFinal score: {amount} points");
     }
 }
