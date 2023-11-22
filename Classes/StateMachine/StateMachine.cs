@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 public class StateMachine
 {
@@ -35,9 +36,9 @@ public class StateMachine
         _currentState?.Enter();
     }
 
-    public void Update()
+    public void Update(GameTime gameTime)
     {
-        _currentState?.Update();
+        _currentState?.Update(gameTime);
     }
     public void Draw()
     {

@@ -39,7 +39,7 @@ public class Game1 : Game
         _gameStateMachine.AddState(new MainMenuState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont));
         CoreGameState coreGameState = new CoreGameState(_gameStateMachine, _spriteBatch,GraphicsDevice,spriteFont,_playerInput);
         _gameStateMachine.AddState(coreGameState);
-        _gameStateMachine.AddState(new GameOverState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont,coreGameState.PlayerStats));
+        _gameStateMachine.AddState(new GameOverState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont,coreGameState));
     }
 
     protected override void Update(GameTime gameTime)
@@ -48,7 +48,7 @@ public class Game1 : Game
             Exit();
 
         _playerInput.HandleInput(gameTime);
-        _gameStateMachine.Update();
+        _gameStateMachine.Update(gameTime);
 
         base.Update(gameTime);
     }

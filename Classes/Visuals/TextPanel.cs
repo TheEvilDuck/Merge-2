@@ -24,4 +24,9 @@ public class TextPanel : VisualObject
     {
         spriteBatch.DrawString(_spriteFont,_text,Position,Color.White);
     }
+
+    public void ChangeText(string text)
+    {
+        _text = text;
+    }
 }

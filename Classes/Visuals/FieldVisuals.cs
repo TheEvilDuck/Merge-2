@@ -10,6 +10,7 @@ public class FieldVisuals
     private const int CELL_VISUAL_SIZE = 30;
     private const float CELL_CONTENT_SIZE_PERCENT = 0.9F;
     private const int CELL_SPACING = 4;
+    private const float ANIMATIONS_TIME_SECONDS = 2f;
 
     public Func<int,int,int,int,bool> cellDropped;
     public Func<int,int,bool> cellDoubleClicked;
@@ -33,6 +34,8 @@ public class FieldVisuals
     private Dictionary<Button,Vector2>_visualCells;
     private Button _holdCell;
 
+    public Animator Animator {get;private set;}
+
 
     public FieldVisuals(SpriteBatch spriteBatch,GraphicsDevice graphicsDevice,byte fieldSize,Field field, SpriteFont spriteFont,PlayerInput playerInput,int xOffset,int yOffset)
     {
@@ -50,12 +53,15 @@ public class FieldVisuals
         _visualCells = new Dictionary<Button,Vector2>();
         field.cellAdded+=OnCellAdded;
         field.cellRemoved+=OnCellRemoved;
+        field.cellsSwitched+=OnToCellsSwitched;
 
         _playerInput.mouseDown+=HoldCell;
         _playerInput.mouseReleased+=DropCell;
 
         cellDropped+=field.CombineTwoCells;
         cellDoubleClicked+=field.TryGenerateNewCellFrom;
+
+        Animator = new Animator();
     }
     public void Draw()
     {
@@ -136,8 +142,6 @@ public class FieldVisuals
         _playerInput.mouseClicked += button.OnPlayerClickedAtPosition;
         _playerInput.mouseDoubleClicked+=button.OnPlayerDoubleClickedAtPosition;
 
-        Console.WriteLine($"Added new visuals in {new Vector2(xIndex,yIndex)}");
-
         button.clicked+=() =>
         {
             _holdCell = button;
@@ -150,10 +154,50 @@ public class FieldVisuals
                 Vector2 indexes = _visualCells[button];
 
                 bool success = cellDoubleClicked.Invoke((int)indexes.X,(int)indexes.Y);
-                Console.WriteLine(success);
             }
         };
 
+    }
+
+    private void OnToCellsSwitched(int x1,int y1,int x2,int y2)
+    {
+        Button button_1 = null;
+        Button button_2 = null;
+        foreach (KeyValuePair<Button,Vector2>keyValuePair in _visualCells)
+        {
+            if (keyValuePair.Value.X==x1&&keyValuePair.Value.Y==y1)
+                button_1 = keyValuePair.Key;
+
+            if (keyValuePair.Value.X==x2&&keyValuePair.Value.Y==y2)
+                button_2 = keyValuePair.Key;
+        }
+
+        if (button_1!=null&&button_2!=null&&button_1!=button_2)
+        {
+
+            MovingAnimation animation = new MovingAnimation(button_2,ConvertIndexesToPosition(x1,y1),ANIMATIONS_TIME_SECONDS);
+
+            button_1.MoveTo(ConvertIndexesToPosition(x2,y2));
+
+            Animator.AddAnimation(animation);
+
+            animation.Play();
+
+            _playerInput.mouseClicked-=button_2.OnPlayerClickedAtPosition;
+
+            animation.completed+= () =>
+            {
+                _playerInput.mouseClicked+=button_2.OnPlayerClickedAtPosition;
+            };
+
+
+
+            _visualCells.Remove(button_1);
+            _visualCells.Remove(button_2);
+
+            _visualCells.Add(button_1, new Vector2(x2,y2));
+            _visualCells.Add(button_2, new Vector2(x1,y1));
+        }
     }
 
     private void OnCellRemoved(int xIndex,int yIndex)
@@ -165,7 +209,6 @@ public class FieldVisuals
                 _playerInput.mouseClicked -= keyValuePair.Key.OnPlayerClickedAtPosition;
                 _playerInput.mouseDoubleClicked -= keyValuePair.Key.OnPlayerDoubleClickedAtPosition;
                 _visualCells.Remove(keyValuePair.Key);
-                Console.WriteLine($"Removed at {keyValuePair.Value} in visuals");
             }
         }
     }

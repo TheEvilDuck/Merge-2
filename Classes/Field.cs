@@ -8,6 +8,7 @@ public class Field
     private Cell[,] _cells;
 
     public event Action<int,int,int,CellColor> cellAdded;
+    public event Action<int,int,int,int>cellsSwitched;
     public event Action<int,int> cellRemoved;
 
     public Field(int size)
@@ -58,13 +59,15 @@ public class Field
                     cellRemoved?.Invoke(x1,y1);
                     cellRemoved?.Invoke(x2,y2);
 
-                    Console.WriteLine($"Cell at {x2},{y2} just level uped to {_cells[x2,y2].Level}. Can generate: {_cells[x2,y2].CanGenerate}");
-
                     cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level,_cells[x2,y2].Color);
 
                     return true;
                 }
             }
+
+            /*
+            NO ANIMATION METHOD^
+            -----------------------------
             cellRemoved?.Invoke(x1,y1);
             cellRemoved?.Invoke(x2,y2);
 
@@ -74,6 +77,14 @@ public class Field
 
             cellAdded?.Invoke(x1,y1, _cells[x1,y1].Level,_cells[x1,y1].Color);
             cellAdded?.Invoke(x2,y2, _cells[x2,y2].Level,_cells[x2,y2].Color);
+
+            */
+
+            Cell buff = _cells[x2,y2];
+            _cells[x2,y2] = _cells[x1,y1];
+            _cells[x1,y1] = buff;
+
+            cellsSwitched.Invoke(x1,y1,x2,y2);
 
             return true;
         }
@@ -97,14 +108,11 @@ public class Field
 
     public bool TryGenerateNewCellFrom(int x, int y)
     {
-        Console.WriteLine($"Try generate at: {x} , {y}");
         if (_cells[x,y]==null)
             return false;
-        Console.WriteLine("It's not null, good");
         
         if (!_cells[x,y].CanGenerate)
             return false;
-        Console.WriteLine($"It can generate because of level {_cells[x,y].Level}");
 
         int xPos,yPos;
 
@@ -115,7 +123,6 @@ public class Field
 
             return true;
         }
-        Console.WriteLine("Couldn't find empty space for new cell");
 
         return false;
     }

@@ -6,8 +6,12 @@ public class OrdersHandler
     public event Action<Order> orderGenerated;
     public event Action<int>orderRemovedAt;
 
+    private readonly int[] pointsForLevel = {1,3,9,27};
+
     private int _amountLeft;
     private Order[] _currentOrders;
+
+    public int OrdersLeft => _amountLeft;
     public OrdersHandler(int ordersAvailable, int ordersInTotal)
     {
         _amountLeft = ordersInTotal;
@@ -30,18 +34,20 @@ public class OrdersHandler
         }
     }
 
-    public void CheckOrderComplete(int i, Field field)
+    public int CheckOrderCompleteAndReturnPoints(int i, Field field)
     {
         if (_currentOrders[i]==null)
-            return;
+            return 0;
         
         if (field.TryFindCell(_currentOrders[i].Level,_currentOrders[i].Color, out int x, out int y))
         {
             field.RemoveCellAt(x,y);
 
-            orderRemovedAt.Invoke(i);
-
             _amountLeft--;
+
+            orderRemovedAt.Invoke(i);
+            
+            int level =_currentOrders[i].Level;
 
             if (_amountLeft<=0)
                 allOrdersCompleted.Invoke();
@@ -51,7 +57,9 @@ public class OrdersHandler
                 GenerateOrder();
             }
 
-            
+            return pointsForLevel[level-1];
         }
+
+        return 0;
     }
 }
