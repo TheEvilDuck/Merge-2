@@ -1,10 +1,9 @@
 using System;
 
 public class PlayerStats
-{   public event Action<int>pointsChanged;
-
+{   
+    public event Action<int>pointsChanged;
     public int Points {get; private set;}
-
     public void AddPoints(int amount)
     {
         if (amount<=0)

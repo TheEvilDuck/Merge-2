@@ -9,6 +9,7 @@ public class OrderPanel: VisualObject
     private const int ORDER_SPACING = 5;
 
     public event Action<int>certainOrderClicked;
+    
     private Button[]_orderButtons;
     private Texture2D _buttonTexture;
     private SpriteFont _buttonSpriteFont;

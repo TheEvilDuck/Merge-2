@@ -7,7 +7,6 @@ public class OrdersHandler
     public event Action<int>orderRemovedAt;
 
     private readonly int[] pointsForLevel = {1,3,9,27};
-
     private int _amountLeft;
     private Order[] _currentOrders;
 
