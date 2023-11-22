@@ -14,7 +14,7 @@ public class FieldVisuals
     public Func<int,int,int,int,bool> cellDropped;
     public Func<int,int,bool> cellDoubleClicked;
 
-    private readonly Dictionary<CellColor,Color>_cellColors = new Dictionary<CellColor, Color>
+    public static readonly Dictionary<CellColor,Color>CellColors = new Dictionary<CellColor, Color>
     {
         {CellColor.Green,Color.Green},
         {CellColor.Red,Color.Red},
@@ -130,7 +130,7 @@ public class FieldVisuals
             CELL_VISUAL_SIZE);
         
         Button button = new Button(_buttonTexture,rectangle,level.ToString(),_buttonSpriteFont);
-        button.SetColor(_cellColors.GetValueOrDefault(cellColor));
+        button.SetColor(CellColors.GetValueOrDefault(cellColor));
         _visualCells.Add(button,new Vector2(xIndex,yIndex));
 
         _playerInput.mouseClicked += button.OnPlayerClickedAtPosition;

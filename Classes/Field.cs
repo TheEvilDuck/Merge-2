@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 public class Field
 {
@@ -89,6 +88,13 @@ public class Field
         cellRemoved?.Invoke(x,y);
     }
 
+    public Cell GetCellAtPosition(int x, int y)
+    {
+        if (x<0||y<0||x>=_size||y>=_size)
+            return null;
+        return _cells[x,y];
+    }
+
     public bool TryGenerateNewCellFrom(int x, int y)
     {
         Console.WriteLine($"Try generate at: {x} , {y}");
@@ -111,6 +117,28 @@ public class Field
         }
         Console.WriteLine("Couldn't find empty space for new cell");
 
+        return false;
+    }
+
+    public bool TryFindCell(int level, CellColor cellColor, out int xFound, out int yFound)
+    {
+        for (int x = 0;x<_size;x++)
+        {
+            for (int y = 0;y<_size;y++)
+            {
+                if (_cells[x,y]!=null)
+                {
+                    if (_cells[x,y].Level==level&&_cells[x,y].Color==cellColor)
+                    {
+                        xFound = x;
+                        yFound = y;
+                        return true;
+                    }
+                }
+            }
+        }
+        xFound = -1;
+        yFound = -1;
         return false;
     }
 

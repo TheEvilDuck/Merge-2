@@ -7,7 +7,6 @@ namespace Merge_3;
 
 public class Game1 : Game
 {
-    private const byte FIELD_SIZE = 8;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
@@ -38,7 +37,9 @@ public class Game1 : Game
         
         SpriteFont spriteFont = Content.Load<SpriteFont>("Font");
         _gameStateMachine.AddState(new MainMenuState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont));
-        _gameStateMachine.AddState(new CoreGameState(_gameStateMachine, FIELD_SIZE,_spriteBatch,GraphicsDevice,spriteFont,_playerInput));
+        CoreGameState coreGameState = new CoreGameState(_gameStateMachine, _spriteBatch,GraphicsDevice,spriteFont,_playerInput);
+        _gameStateMachine.AddState(coreGameState);
+        _gameStateMachine.AddState(new GameOverState(_gameStateMachine,_spriteBatch,GraphicsDevice,_playerInput,spriteFont,coreGameState.PlayerStats));
     }
 
     protected override void Update(GameTime gameTime)
