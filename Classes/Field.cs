@@ -10,6 +10,7 @@ public class Field
     public event Action<int,int,int,CellColor> cellAdded;
     public event Action<int,int,int,int>cellsSwitched;
     public event Action<int,int> cellRemoved;
+    public event Action<int,int,int,int,int,CellColor>cellGenerated;
 
     public Field(int size)
     {
@@ -119,7 +120,7 @@ public class Field
         if (TryGetRandomPosition(out xPos,out yPos))
         {
             _cells[xPos,yPos] = _cells[x,y].Generate();
-            cellAdded.Invoke(xPos,yPos,_cells[xPos,yPos].Level,_cells[xPos,yPos].Color);
+            cellGenerated.Invoke(x,y,xPos,yPos,_cells[xPos,yPos].Level,_cells[xPos,yPos].Color);
 
             return true;
         }

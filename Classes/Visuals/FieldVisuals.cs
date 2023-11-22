@@ -11,6 +11,7 @@ public class FieldVisuals
     private const float CELL_CONTENT_SIZE_PERCENT = 0.9F;
     private const int CELL_SPACING = 4;
     private const float ANIMATIONS_TIME_SECONDS = 2f;
+    private const int GENERATED_ELEMENT_Y_OFFEST = 25;
 
     public Func<int,int,int,int,bool> cellDropped;
     public Func<int,int,bool> cellDoubleClicked;
@@ -54,6 +55,7 @@ public class FieldVisuals
         field.cellAdded+=OnCellAdded;
         field.cellRemoved+=OnCellRemoved;
         field.cellsSwitched+=OnToCellsSwitched;
+        field.cellGenerated+=OnCellGenerated;
 
         _playerInput.mouseDown+=HoldCell;
         _playerInput.mouseReleased+=DropCell;
@@ -219,6 +221,45 @@ public class FieldVisuals
             xIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,
             yIndex*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset
         );
+    }
+
+    private void OnCellGenerated(int xFrom, int yFrom, int xTo, int yTo, int level, CellColor color)
+    {
+        Rectangle rectangle = new Rectangle(
+            xFrom*(CELL_VISUAL_SIZE+CELL_SPACING)+_xOffset,
+            yFrom*(CELL_VISUAL_SIZE+CELL_SPACING)+_yOffset+GENERATED_ELEMENT_Y_OFFEST,
+            CELL_VISUAL_SIZE,
+            CELL_VISUAL_SIZE);
+        
+        Button button = new Button(_buttonTexture,rectangle,level.ToString(),_buttonSpriteFont);
+        button.SetColor(CellColors.GetValueOrDefault(color));
+
+        MovingAnimation animation = new MovingAnimation(button,ConvertIndexesToPosition(xTo,yTo),ANIMATIONS_TIME_SECONDS);
+        Animator.AddAnimation(animation);
+        animation.Play();
+
+        _visualCells.Add(button,new Vector2(xTo,yTo));
+
+        animation.completed+= () =>
+        {
+            _playerInput.mouseClicked += button.OnPlayerClickedAtPosition;
+            _playerInput.mouseDoubleClicked+=button.OnPlayerDoubleClickedAtPosition;
+        };
+
+        button.clicked+=() =>
+        {
+            _holdCell = button;
+        };
+
+        button.doubleClicked+=() =>
+        {
+            if (_visualCells.ContainsKey(button))
+            {
+                Vector2 indexes = _visualCells[button];
+
+                bool success = cellDoubleClicked.Invoke((int)indexes.X,(int)indexes.Y);
+            }
+        };
     }
 
 }
