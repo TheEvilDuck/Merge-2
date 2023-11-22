@@ -10,6 +10,5 @@ public class Order
         Random random = new Random();
         Level = random.Next(1,5);
         Color = colors[random.Next(0,colors.Length)];
-        Console.WriteLine($"Generated order for level {Level} and Color {Color}");
     }
 }

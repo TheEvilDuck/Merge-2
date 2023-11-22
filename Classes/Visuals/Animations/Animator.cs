@@ -18,7 +18,6 @@ public class Animator
         _animations.Add(animation);
         animation.completed+= () =>
         {
-            Console.WriteLine("AAAAAAAAAAAAAA");
             if (_animations.Contains(animation))
                 _completedAnimations.Add(animation);
         };

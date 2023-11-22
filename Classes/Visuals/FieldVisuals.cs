@@ -33,6 +33,7 @@ public class FieldVisuals
     private PlayerInput _playerInput;
 
     private Dictionary<Button,Vector2>_visualCells;
+    private List<Button>_visualCellsShouldBeOnTop;
     private Button _holdCell;
 
     public Animator Animator {get;private set;}
@@ -52,6 +53,7 @@ public class FieldVisuals
         _xOffset = xOffset-fieldSize*(CELL_VISUAL_SIZE+CELL_SPACING)/2;
 
         _visualCells = new Dictionary<Button,Vector2>();
+        _visualCellsShouldBeOnTop = new List<Button>();
         field.cellAdded+=OnCellAdded;
         field.cellRemoved+=OnCellRemoved;
         field.cellsSwitched+=OnToCellsSwitched;
@@ -83,8 +85,13 @@ public class FieldVisuals
         foreach (KeyValuePair<Button,Vector2>button in _visualCells)
         {
             
-            if (button.Key!=_holdCell)
+            if (button.Key!=_holdCell&&!_visualCellsShouldBeOnTop.Contains(button.Key))
                 button.Key.Draw(_spriteBatch);
+        }
+
+        foreach (Button button in _visualCellsShouldBeOnTop)
+        {
+            button.Draw(_spriteBatch);
         }
 
         if (_holdCell!=null)
@@ -180,16 +187,17 @@ public class FieldVisuals
             MovingAnimation animation = new MovingAnimation(button_2,ConvertIndexesToPosition(x1,y1),ANIMATIONS_TIME_SECONDS);
 
             button_1.MoveTo(ConvertIndexesToPosition(x2,y2));
-
             Animator.AddAnimation(animation);
-
             animation.Play();
 
             _playerInput.mouseClicked-=button_2.OnPlayerClickedAtPosition;
 
+            _visualCellsShouldBeOnTop.Add(button_2);
+
             animation.completed+= () =>
             {
                 _playerInput.mouseClicked+=button_2.OnPlayerClickedAtPosition;
+                _visualCellsShouldBeOnTop.Remove(button_2);
             };
 
 
@@ -240,10 +248,13 @@ public class FieldVisuals
 
         _visualCells.Add(button,new Vector2(xTo,yTo));
 
+        _visualCellsShouldBeOnTop.Add(button);
+
         animation.completed+= () =>
         {
             _playerInput.mouseClicked += button.OnPlayerClickedAtPosition;
             _playerInput.mouseDoubleClicked+=button.OnPlayerDoubleClickedAtPosition;
+            _visualCellsShouldBeOnTop.Remove(button);
         };
 
         button.clicked+=() =>

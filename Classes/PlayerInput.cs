@@ -49,7 +49,6 @@ public class PlayerInput
             if (!_clicked&&_doubleClicked)
             {
                 mouseDoubleClicked?.Invoke(mousePosition);
-                Console.WriteLine("DOUBLE CLICK");
             }
             
             _clicked = false;
